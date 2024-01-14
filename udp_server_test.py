@@ -11,11 +11,11 @@ print("UDP target port: %s" % UDP_PORT)
 print("message: %s" % MESSAGE)
 
 udp_pack = UdpPack()
-udp_data = udp_pack.udp_assemble(1123, 32, MESSAGE)
 
 sock = socket.socket(socket.AF_INET, # Internet
                      socket.SOCK_DGRAM) # UDP
 while True:
+    udp_data = udp_pack.udp_assemble(int(time.time()*1000.0), 32, MESSAGE)
     sock.sendto(udp_data, (UDP_IP, UDP_PORT))
     print("Msg sent: {}".format(udp_pack))
     time.sleep(1)

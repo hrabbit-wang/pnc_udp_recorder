@@ -4,14 +4,34 @@ import socket
 import sys
 import os
 from udp_pack_def import UdpPack
+from udp_buffer import UdpPackBuffer
+
 
 max_struct_byte = 32 * 1024
+record_duration = 10
+dur_before_trig = 4
+dur_after_trig = 2
 
 class UdpRecorder(object):
     def __init__(self, server_ip, bind_port) -> None:
         self.client_ = None
+        self.record_duration_ = record_duration
+        self.buf_ = UdpPackBuffer(self.record_duration_, "./")
         # create socket connection
         self.bind_server(server_ip, bind_port)
+        self.exit_ = False
+
+    def trigger_evt(self, time):
+        time_s = time - dur_before_trig
+        time_e = time + dur_after_trig
+        self.buf_.trigger([time_s, time_e])
+
+    def exit(self):
+        self.exit_ = True
+        self.buf_.exit()
+
+    def set_save_dir(self, dir):
+        self.buf_.set_save_dir(dir)
 
     def bind_server(self, ip, port):
         self.client_ = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -19,12 +39,12 @@ class UdpRecorder(object):
 
     def receive(self):
         # always receive data
-        while True:
+        while not self.exit_:
             try:
                 msg, addr  = self.client_.recvfrom(max_struct_byte)
-
                 udp_pack = UdpPack()
                 udp_pack.udp_unassemble(msg)
+                self.buf_.add(udp_pack)
                 # 
                 print("receive udp pack {}".format(udp_pack))
                 # time.sleep(3)
@@ -33,12 +53,3 @@ class UdpRecorder(object):
                 break
         self.client_.close()
         print("socket closed")
-
-if __name__ == "__main__":
-  if len(sys.argv) != 3:
-  	print ("Usage: udp_recorder.py ip port")
-  	exit(1)
-
-  print("info {}, {}, {}".format(sys.argv[0], sys.argv[1], sys.argv[2]))
-  udp_rec = UdpRecorder(sys.argv[1], int(sys.argv[2]))
-  udp_rec.receive()

@@ -13,7 +13,7 @@ class UdpPack(object):
     def udp_unassemble(self, udp_data):
         fmt = "QII" + str(len(udp_data) - self.head_len_) + "s"
         self.timestamp_, self.msg_count_, self.msg_size_, self.data_ = struct.unpack(fmt, udp_data)
-        print("udp: {}, {}, {}, {}".format(self.timestamp_, self.msg_count_, self.msg_size_, self.data_))
+        # print("udp: {}, {}, {}, {}".format(self.timestamp_, self.msg_count_, self.msg_size_, self.data_))
 
     def udp_assemble(self, timestamp, msg_count, data):
         self.timestamp_ = timestamp
