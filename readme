@@ -1,1 +1,1 @@
-python3 -m pip install pysimplegui
+pip install pyqt5

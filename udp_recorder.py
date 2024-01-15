@@ -24,7 +24,7 @@ class UdpRecorder(object):
     def trigger_evt(self, time):
         time_s = time - dur_before_trig
         time_e = time + dur_after_trig
-        self.buf_.trigger([time_s, time_e])
+        self.buf_.trigger([time_s, time_e], time)
 
     def exit(self):
         self.exit_ = True
