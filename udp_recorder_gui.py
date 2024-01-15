@@ -41,7 +41,8 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     app.setStyle('Fusion')
     # start the bk udp recording thread
-    udp_rec = UdpRecorder("192.168.1.187", 6002)
+    # broadcast udp
+    udp_rec = UdpRecorder("", 6002)
     rec_thread = Thread(target=udp_rec.receive, args=())
     rec_thread.start()
     # Create and show the form

@@ -11,18 +11,19 @@ class UdpPack(object):
         self.data_ = None
 
     def udp_unassemble(self, udp_data):
-        fmt = "QII" + str(len(udp_data) - self.head_len_) + "s"
-        self.timestamp_, self.msg_count_, self.msg_size_, self.data_ = struct.unpack(fmt, udp_data)
+        fmt = "QHHI" + str(len(udp_data) - self.head_len_) + "s"
+        self.timestamp_, self.msg_id_, self.msg_count_, self.msg_size_, self.data_ = struct.unpack(fmt, udp_data)
         # print("udp: {}, {}, {}, {}".format(self.timestamp_, self.msg_count_, self.msg_size_, self.data_))
 
-    def udp_assemble(self, timestamp, msg_count, data):
+    def udp_assemble(self, timestamp, msg_id, msg_count, data):
         self.timestamp_ = timestamp
+        self.msg_id_ = msg_id
         self.msg_count_ = msg_count
         self.msg_size_ = len(data)
         self.data_ = data
         
-        fmt = "QII" + str(self.msg_size_) + "s"
-        byte_date = struct.pack(fmt, self.timestamp_, self.msg_count_,
+        fmt = "QHHI" + str(self.msg_size_) + "s"
+        byte_date = struct.pack(fmt, self.timestamp_, self.msg_count_, self.msg_id_,
                                      self.msg_size_, self.data_)
         return byte_date
 
