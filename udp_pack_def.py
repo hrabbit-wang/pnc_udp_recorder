@@ -28,4 +28,4 @@ class UdpPack(object):
         return byte_date
 
     def __str__(self):
-        return f"{self.timestamp_}, {self.msg_count_}, {self.msg_size_}, {self.data_}"
+        return f"{self.timestamp_}, {self.msg_id_}, {self.msg_count_}, {self.msg_size_}, {self.data_}"

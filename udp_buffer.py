@@ -1,5 +1,6 @@
 #
 import time
+import struct
 import numpy as np
 from threading import Thread
 from udp_pack_def import UdpPack
@@ -29,7 +30,12 @@ class UdpPackBuffer(object):
             'Veh_CAN_Inputs': bytearray(), 'CAM_CAN_Inputs': bytearray(), 'FusionObjects_Com': bytearray(), 'TFL_message': bytearray(),
             'ADAS_Inputs': bytearray(), 'EM_Outputs': bytearray(), 'FCT_Outputs': bytearray(), 'PLN_Outpus': bytearray(),
             'CTRL_Outputs': bytearray(), 'AdptrOut_ADS2VEH': bytearray(), 'AdptrOut_ADS2HMI': bytearray(), 'AdptrOut_Out2In': bytearray(),
-            'FCT_Measurement': bytearray(), 'PLN_Measurement': bytearray(), 'CTRL_Measurement': bytearray()
+            'FCT_Measurement': bytearray(), 'PLN_Measurement': bytearray(), 'CTRL_Measurement': bytearray(),
+            # ts of every struct
+            'Veh_CAN_Inputs_ts': bytearray(), 'CAM_CAN_Inputs_ts': bytearray(), 'FusionObjects_Com_ts': bytearray(), 'TFL_message_ts': bytearray(),
+            'ADAS_Inputs_ts': bytearray(), 'EM_Outputs_ts': bytearray(), 'FCT_Outputs_ts': bytearray(), 'PLN_Outpus_ts': bytearray(),
+            'CTRL_Outputs_ts': bytearray(), 'AdptrOut_ADS2VEH_ts': bytearray(), 'AdptrOut_ADS2HMI_ts': bytearray(), 'AdptrOut_Out2In_ts': bytearray(),
+            'FCT_Measurement_ts': bytearray(), 'PLN_Measurement_ts': bytearray(), 'CTRL_Measurement_ts': bytearray()
         }
         id_name_mapping = {
             0x0001: 'Veh_CAN_Inputs', 0x0002: 'CAM_CAN_Inputs', 0x0003: 'FusionObjects_Com', 0x0004: 'TFL_message',
@@ -41,7 +47,14 @@ class UdpPackBuffer(object):
         for t in range(trigger[0], trigger[1]):
             if t in self.datas_.keys():
                 for udp_pack in self.datas_[t]:
-                    save_data[id_name_mapping[udp_pack.msg_id_]].extend(udp_pack.data_)
+                    struct_name = id_name_mapping[udp_pack.msg_id_]
+                    struct_ts = struct_name + '_ts'
+                    # store the struct data
+                    save_data[struct_name].extend(udp_pack.data_)
+                    # store the struct ts
+                    # pack ts to bytes
+                    byte_ts = struct.pack("Q", udp_pack.timestamp_)
+                    save_data[struct_ts].extend(byte_ts)
         # save to file
         np.save(file_name, save_data)
         print("Trigger [{}, {}] saved !!!!!!".format(trigger[0], trigger[1]))
